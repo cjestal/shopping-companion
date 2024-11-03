@@ -428,17 +428,18 @@
 												>
 													<div
 														class="h-48 w-48 rounded-lg border-2 border-dashed border-gray-400"
-													></div>
+													>
+														<div class="absolute inset-0 flex items-center justify-center">
+															<div id="qr-overlay" class="w-64 h-60 border-dashed border-4 border-red-500 z-20"></div>
+														</div>
+													</div>
 												</div>
-												<img
-													src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-													class="h-full w-full object-cover"
-													alt="QR Scanner View"
-												/>
+												<qrcode-stream @detect="onDetect"></qrcode-stream>
+												
 											</div>
-											<div
+											<!-- <div
 												class="absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent"
-											></div>
+											></div> -->
 										</div>
 									</div>
 
@@ -594,8 +595,13 @@
 									<div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
 										<div class="flow-root">
 											<div class="space-y-6">
-												<fieldset v-for="recipe in shoppingList" :key="recipe.name">
-													<legend class="text-lg font-bold text-gray-900 border-b-2 border-red-600 pb-1 inline-block">
+												<fieldset
+													v-for="recipe in shoppingList"
+													:key="recipe.name"
+												>
+													<legend
+														class="text-lg font-bold text-gray-900 border-b-2 border-red-600 pb-1 inline-block"
+													>
 														{{ recipe.name }}
 													</legend>
 													<div
@@ -605,7 +611,9 @@
 															v-for="(ingredient, idx) in recipe.ingredients"
 															:key="idx"
 															class="relative flex items-start py-4 cursor-pointer"
-															@click="recipe.selected[idx] = !recipe.selected[idx]"
+															@click="
+																recipe.selected[idx] = !recipe.selected[idx]
+															"
 														>
 															<div class="min-w-0 flex-1 text-sm/6">
 																<label
@@ -613,7 +621,8 @@
 																	class="select-none font-medium"
 																	:class="{
 																		'text-gray-900': !recipe.selected[idx],
-																		'text-gray-500 line-through': recipe.selected[idx]
+																		'text-gray-500 line-through':
+																			recipe.selected[idx],
 																	}"
 																	>{{ ingredient }}</label
 																>
@@ -648,7 +657,14 @@
 										<div class="mt-6">
 											<button
 												type="button"
-												@click="shoppingList.forEach(recipe => recipe.selected = recipe.selected.map(() => true))"
+												@click="
+													shoppingList.forEach(
+														(recipe) =>
+															(recipe.selected = recipe.selected.map(
+																() => true
+															))
+													)
+												"
 												class="flex items-center justify-center rounded-md border border-transparent bg-red-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700 w-full"
 											>
 												Add all items to cart
@@ -707,37 +723,53 @@ import {
 	ShoppingBagIcon,
 	QrCodeIcon,
 } from "@heroicons/vue/24/outline";
-import { ChevronDownIcon } from "@heroicons/vue/20/solid";
+import { QrcodeStream } from "vue-qrcode-reader";
 
 const mobileMenuOpen = ref(false);
 const open = ref(false);
 const shoppingListOpen = ref(false);
 
+const onDetect = (result) => {
+	console.log(result);
+};
+
 const shoppingList = ref([
 	{
-		id: 'banana-bread',
-		name: 'Banana Bread',
-		ingredients: ['Bananas', 'Flour', 'Sugar', 'Eggs'],
-		selected: [false, false, false, false]
+		id: "banana-bread",
+		name: "Banana Bread",
+		ingredients: ["Bananas", "Flour", "Sugar", "Eggs"],
+		selected: [false, false, false, false],
 	},
 	{
-		id: 'smoothie',
-		name: 'Strawberry Smoothie', 
-		ingredients: ['Strawberries', 'Yogurt', 'Honey', 'Ice'],
-		selected: [false, false, false, false]
+		id: "smoothie",
+		name: "Strawberry Smoothie",
+		ingredients: ["Strawberries", "Yogurt", "Honey", "Ice"],
+		selected: [false, false, false, false],
 	},
 	{
-		id: 'chicken-stir-fry',
-		name: 'Chicken Stir Fry',
-		ingredients: ['Chicken Breast', 'Bell Peppers', 'Broccoli', 'Soy Sauce', 'Rice'],
-		selected: [false, false, false, false, false]
+		id: "chicken-stir-fry",
+		name: "Chicken Stir Fry",
+		ingredients: [
+			"Chicken Breast",
+			"Bell Peppers",
+			"Broccoli",
+			"Soy Sauce",
+			"Rice",
+		],
+		selected: [false, false, false, false, false],
 	},
 	{
-		id: 'chocolate-chip-cookies',
-		name: 'Chocolate Chip Cookies',
-		ingredients: ['Butter', 'Brown Sugar', 'Flour', 'Chocolate Chips', 'Vanilla Extract'],
-		selected: [false, false, false, false, false]
-	}
+		id: "chocolate-chip-cookies",
+		name: "Chocolate Chip Cookies",
+		ingredients: [
+			"Butter",
+			"Brown Sugar",
+			"Flour",
+			"Chocolate Chips",
+			"Vanilla Extract",
+		],
+		selected: [false, false, false, false, false],
+	},
 ]);
 
 const selectedCount = computed(() => {
@@ -753,88 +785,88 @@ const totalItems = computed(() => {
 });
 
 const clearSelections = () => {
-	shoppingList.value.forEach(recipe => {
+	shoppingList.value.forEach((recipe) => {
 		recipe.selected = recipe.selected.map(() => false);
 	});
 };
 
 const navigation = {
 	categories: [
-		{
-			name: "Products",
-			featured: [
-				{
-					name: "Advertised Specials",
-					href: "#",
-					imageSrc:
-						"https://tailwindui.com/plus/img/ecommerce-images/mega-menu-category-01.jpg",
-					imageAlt:
-						"Models sitting back to back, wearing Basic Tee in black and bone.",
-				},
-				{
-					name: "Popular Recipes",
-					href: "#",
-					imageSrc:
-						"https://tailwindui.com/plus/img/ecommerce-images/mega-menu-category-02.jpg",
-					imageAlt:
-						"Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.",
-				},
-				{
-					name: "Accessories",
-					href: "#",
-					imageSrc:
-						"https://tailwindui.com/plus/img/ecommerce-images/mega-menu-category-03.jpg",
-					imageAlt:
-						"Model wearing minimalist watch with black wristband and white watch face.",
-				},
-				{
-					name: "Carry",
-					href: "#",
-					imageSrc:
-						"https://tailwindui.com/plus/img/ecommerce-images/mega-menu-category-04.jpg",
-					imageAlt:
-						"Model opening tan leather long wallet with credit card pockets and cash pouch.",
-				},
-			],
-		},
-		{
-			name: "Recipes",
-			featured: [
-				{
-					name: "Quick & Easy",
-					href: "#",
-					imageSrc:
-						"https://images.unsplash.com/photo-1490645935967-10de6ba17061?h=400&fit=crop",
-					imageAlt: "Bowl of fresh salad with grilled chicken and vegetables.",
-				},
-				{
-					name: "Healthy Options",
-					href: "#",
-					imageSrc:
-						"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?h=400&fit=crop",
-					imageAlt: "Colorful buddha bowl with quinoa, vegetables and tofu.",
-				},
-				{
-					name: "Family Favorites",
-					href: "#",
-					imageSrc:
-						"https://images.unsplash.com/photo-1504674900247-0877df9cc836?h=400&fit=crop",
-					imageAlt:
-						"Large family style pasta dish with garlic bread on rustic wooden table.",
-				},
-				{
-					name: "Seasonal Specials",
-					href: "#",
-					imageSrc:
-						"https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?h=400&fit=crop",
-					imageAlt: "Autumn harvest soup with fresh bread and herbs.",
-				},
-			],
-		},
+		// {
+		// 	name: "Products",
+		// 	featured: [
+		// 		{
+		// 			name: "Advertised Specials",
+		// 			href: "#",
+		// 			imageSrc:
+		// 				"https://tailwindui.com/plus/img/ecommerce-images/mega-menu-category-01.jpg",
+		// 			imageAlt:
+		// 				"Models sitting back to back, wearing Basic Tee in black and bone.",
+		// 		},
+		// 		{
+		// 			name: "Popular Recipes",
+		// 			href: "#",
+		// 			imageSrc:
+		// 				"https://tailwindui.com/plus/img/ecommerce-images/mega-menu-category-02.jpg",
+		// 			imageAlt:
+		// 				"Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.",
+		// 		},
+		// 		{
+		// 			name: "Accessories",
+		// 			href: "#",
+		// 			imageSrc:
+		// 				"https://tailwindui.com/plus/img/ecommerce-images/mega-menu-category-03.jpg",
+		// 			imageAlt:
+		// 				"Model wearing minimalist watch with black wristband and white watch face.",
+		// 		},
+		// 		{
+		// 			name: "Carry",
+		// 			href: "#",
+		// 			imageSrc:
+		// 				"https://tailwindui.com/plus/img/ecommerce-images/mega-menu-category-04.jpg",
+		// 			imageAlt:
+		// 				"Model opening tan leather long wallet with credit card pockets and cash pouch.",
+		// 		},
+		// 	],
+		// },
+		// {
+		// 	name: "Recipes",
+		// 	featured: [
+		// 		{
+		// 			name: "Quick & Easy",
+		// 			href: "#",
+		// 			imageSrc:
+		// 				"https://images.unsplash.com/photo-1490645935967-10de6ba17061?h=400&fit=crop",
+		// 			imageAlt: "Bowl of fresh salad with grilled chicken and vegetables.",
+		// 		},
+		// 		{
+		// 			name: "Healthy Options",
+		// 			href: "#",
+		// 			imageSrc:
+		// 				"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?h=400&fit=crop",
+		// 			imageAlt: "Colorful buddha bowl with quinoa, vegetables and tofu.",
+		// 		},
+		// 		{
+		// 			name: "Family Favorites",
+		// 			href: "#",
+		// 			imageSrc:
+		// 				"https://images.unsplash.com/photo-1504674900247-0877df9cc836?h=400&fit=crop",
+		// 			imageAlt:
+		// 				"Large family style pasta dish with garlic bread on rustic wooden table.",
+		// 		},
+		// 		{
+		// 			name: "Seasonal Specials",
+		// 			href: "#",
+		// 			imageSrc:
+		// 				"https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?h=400&fit=crop",
+		// 			imageAlt: "Autumn harvest soup with fresh bread and herbs.",
+		// 		},
+		// 	],
+		// },
 	],
 	pages: [
-		{ name: "Company", href: "#" },
-		{ name: "Stores", href: "#" },
+		// { name: "Company", href: "#" },
+		// { name: "Stores", href: "#" },
 	],
 };
 </script>
